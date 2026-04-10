@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMSUG - Jamia Masjid Sayyidina Usman Ghani</title>
+    <link rel="icon" type="image/png" href="1.png"> 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styles & Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f8fbfa; color: #333; line-height: 1.6; }
+        a { text-decoration: none; }
+        
+        /* Navbar */
+        header { background: #ffffff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo-container { display: flex; align-items: center; }
+        .logo-img { height: 50px; margin-right: 15px; } 
+        .logo-text { font-size: 28px; font-weight: 800; color: #105934; letter-spacing: 1px; }
+        .nav-btn { background: #28a745; color: white; padding: 10px 24px; border-radius: 5px; font-weight: 600; transition: background 0.3s; cursor: pointer; border: none; font-size: 16px;}
+        .nav-btn:hover { background: #1e7e34; }
+
+        /* Hero Section */
+        .hero { text-align: center; padding: 100px 20px; background: linear-gradient(135deg, #ffffff 0%, #eefcf1 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .hero h1 { font-size: 48px; color: #0d4a2b; margin-bottom: 20px; font-weight: 800; max-width: 800px; }
+        .hero p { font-size: 18px; color: #555; max-width: 700px; margin-bottom: 40px; }
+        .hero-btn { background: #28a745; color: white; padding: 15px 35px; border-radius: 50px; font-size: 18px; font-weight: 600; border: none; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3); }
+
+        /* Categories Section (The 4 Cards) */
+        .causes-section { background-color: #1f5b8b; padding: 60px 5%; }
+        .causes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .cause-card { background: #2bc155; display: flex; flex-direction: column; text-align: center; border: 1px solid rgba(0,0,0,0.1); }
+        .cause-img { width: 100%; height: 220px; object-fit: cover; background-color: #fff; }
+        .cause-content { padding: 25px 15px; display: flex; flex-direction: column; flex-grow: 1; justify-content: center; align-items: center; }
+        .cause-title { color: white; font-size: 22px; font-weight: 700; text-transform: uppercase; margin-bottom: 25px; line-height: 1.2; }
+        .cause-btn { background: white; color: #2bc155; padding: 12px 20px; border: none; font-weight: 700; cursor: pointer; width: 80%; text-transform: uppercase; font-size: 14px; letter-spacing: 0.5px; transition: background 0.3s; }
+        .cause-btn:hover { background: #f0f0f0; }
+
+        /* Donation Form Section */
+        .donation-section { padding: 80px 20px; display: flex; justify-content: center; align-items: center; background: #f8fbfa; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 500px; border-top: 5px solid #28a745; }
+        .container h2 { text-align: center; color: #105934; margin-bottom: 10px; }
+        .payment-info { text-align: center; background: #eefcf1; padding: 15px; border-radius: 6px; margin-bottom: 25px; font-size: 14px; color: #333; border: 1px dashed #28a745; }
+        .payment-info strong { color: #105934; font-size: 16px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 14px; }
+        input, select { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; font-family: 'Poppins', sans-serif; transition: border-color 0.3s; }
+        input:focus, select:focus { border-color: #28a745; outline: none; box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1); }
+        input[type="file"] { border: 2px dashed #ddd; cursor: pointer; padding: 20px; text-align: center; color: #888; background: #fafafa; }
+        input[type="file"]:hover { border-color: #28a745; }
+        
+        .submit-btn { width: 100%; padding: 14px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; transition: background-color 0.3s; margin-top: 10px; }
+        .submit-btn:hover { background-color: #1e7e34; }
+        .submit-btn:disabled { background-color: #94d3a2; cursor: not-allowed; }
+        
+        /* Status Messages */
+        .message { margin-top: 20px; text-align: center; font-weight: 600; font-size: 14px; padding: 10px; border-radius: 4px; display: none; }
+        .error { color: #dc3545; background: #f8d7da; display: block; }
+        .success { color: #155724; background: #d4edda; display: block; }
+
+        /* Footer */
+        footer { background: #0d4a2b; color: white; text-align: center; padding: 20px; margin-top: auto; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="1.png" alt="JMSUG Logo" class="logo-img"> 
+            <div class="logo-text">JMSUG</div>
+        </div>
+        <button onclick="scrollToForm('General Support')" class="nav-btn">Donate Now ♥</button>
+    </header>
+
+    <section class="hero">
+        <h1>Jamia Masjid Sayyidina Usman Ghani</h1>
+        <p>Empowering our community through faith and generosity. The official donation portal for Jamia Masjid Sayyidina Usman Ghani offers a secure, seamless way to support the house of Allah. Give with ease and secure your Sadaqah Jariyah today.</p>
+        <button class="hero-btn" onclick="scrollToForm('General Support')">
+            ♥ Start Donating
+        </button>
+    </section>
+
+    <section class="causes-section">
+        <div class="causes-grid">
+            <div class="cause-card">
+                <img src="3.png" alt="Fitra" class="cause-img">
+                <div class="cause-content">
+                    <div class="cause-title">Fitra, Fidya,<br>Kaffara</div>
+                    <button class="cause-btn" onclick="scrollToForm('Fitra, Fidya, Kaffara')">DONATE NOW ></button>
+                </div>
+            </div>
+
+            <div class="cause-card">
+                <img src="2.png" alt="Zakat" class="cause-img">
+                <div class="cause-content">
+                    <div class="cause-title">Sadqa &<br>Zakat</div>
+                    <button class="cause-btn" onclick="scrollToForm('Sadqa & Zakat')">DONATE NOW ></button>
+                </div>
+            </div>
+
+            <div class="cause-card">
+                <img src="4.jpeg" alt="Animal" class="cause-img">
+                <div class="cause-content">
+                    <div class="cause-title">Sadqah / Aqiqah<br>Qurbani </div>
+                    <button class="cause-btn" onclick="scrollToForm('Sadqah / Aqiqah Qurbani')">DONATE NOW ></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="donate" class="donation-section">
+        <div class="container">
+            <h2>Submit Donation Proof</h2>
+            
+            <div class="payment-info">
+                Please transfer your donation to:<br><br>
+                <strong>Easypaisa:</strong> 0345-XXXXXXX (JMSUG)<br>
+                <strong>JazzCash:</strong> 0300-XXXXXXX (JMSUG)<br><br>
+                Take a screenshot of your successful transaction and upload it below.
+            </div>
+
+            <form id="donationForm">
+                <div class="form-group">
+                    <label for="category">Donation Category</label>
+                    <select id="category" required>
+                        <option value="General Support">General Support</option>
+                        <option value="Fitra, Fidya, Kaffara">Fitra, Fidya, Kaffara</option>
+                        <option value="Gazzah Support Fund">Gazzah Support Fund</option>
+                        <option value="Sadqa & Zakat">Sadqa & Zakat</option>
+                        <option value="Sadqah / Aqiqah Animal">Sadqah / Aqiqah Animal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" required placeholder="e.g., Ali Khan">
+                </div>
+                <div class="form-group">
+                    <label for="phone">WhatsApp / Phone Number</label>
+                    <input type="tel" id="phone" required pattern="^03\d{9}$" placeholder="03XXXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="paymentProof">Upload Payment Proof Screenshot</label>
+                    <input type="file" id="paymentProof" required accept="image/*">
+                </div>
+                <button type="submit" id="submitBtn" class="submit-btn">Submit Proof</button>
+            </form>
+            <div id="statusMessage" class="message"></div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; <span id="year"></span> Jamia Masjid Sayyidina Usman Ghani. All rights reserved. 
+        <a href="/public/admin.html" style="color: transparent; user-select: none;">.</a>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Smooth Scroll & Auto-Select Category Logic
+        function scrollToForm(categoryValue) {
+            document.getElementById('category').value = categoryValue;
+            document.getElementById('donate').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- CLOUDINARY CONFIGURATION ---
+        const CLOUDINARY_UPLOAD_PRESET = 'jmsug_donations';
+        const CLOUDINARY_CLOUD_NAME = 'drudoiir7';
+        const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+        // Handle Form Submission
+        document.getElementById('donationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const category = document.getElementById('category').value;
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const paymentProofInput = document.getElementById('paymentProof');
+            const statusMessage = document.getElementById('statusMessage');
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading & Processing...';
+            statusMessage.textContent = '';
+            statusMessage.className = 'message';
+
+            const file = paymentProofInput.files[0];
+
+            try {
+                // 1. Upload to Cloudinary
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+                const cloudinaryResponse = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+                if (!cloudinaryResponse.ok) throw new Error('Image upload failed.');
+                
+                const cloudinaryData = await cloudinaryResponse.json();
+                const paymentProofUrl = cloudinaryData.secure_url;
+
+                // 2. Send to Netlify Backend
+                const response = await fetch('/api/donate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone, category, paymentProofUrl })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    statusMessage.textContent = 'Jazak\'Allah! Your payment proof has been submitted for review.';
+                    statusMessage.className = 'message success';
+                    document.getElementById('donationForm').reset();
+                } else {
+                    statusMessage.textContent = data.error || 'Something went wrong.';
+                    statusMessage.className = 'message error';
+                }
+            } catch (error) {
+                statusMessage.textContent = 'Error submitting. Please check your connection or image size.';
+                statusMessage.className = 'message error';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Proof';
+            }
+        });
+    </script>
+
+</body>
+</html>

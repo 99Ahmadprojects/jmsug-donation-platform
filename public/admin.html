@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMSUG - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8fbfa; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .admin-panel { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; max-width: 400px; width: 100%; border-top: 5px solid #1f5b8b; }
+        .admin-panel h2 { color: #1f5b8b; margin-bottom: 10px; }
+        .admin-panel p { color: #666; margin-bottom: 30px; font-size: 14px; }
+        .download-btn { background-color: #1f5b8b; color: white; padding: 15px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; width: 100%; transition: background-color 0.3s; }
+        .download-btn:hover { background-color: #154366; }
+        .download-btn:disabled { background-color: #92b0c7; cursor: not-allowed; }
+        .message { margin-top: 15px; font-size: 14px; font-weight: 600; display: none; }
+        .success { color: #155724; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-panel">
+        <h2>Admin Portal</h2>
+        <p>Download the latest donation records and payment proof links.</p>
+        
+        <button id="downloadBtn" class="download-btn">⬇ Download CSV Data</button>
+        <div id="statusMessage" class="message"></div>
+    </div>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('downloadBtn');
+            const statusMsg = document.getElementById('statusMessage');
+            
+            btn.disabled = true;
+            btn.textContent = 'Fetching Data...';
+            statusMsg.style.display = 'none';
+
+            try {
+                // 1. Fetch data from backend
+                const response = await fetch('/api/admin/donations');
+                if (!response.ok) throw new Error('Failed to fetch data');
+                
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    statusMsg.textContent = 'No donations found in the database.';
+                    statusMsg.className = 'message error';
+                    statusMsg.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = '⬇ Download CSV Data';
+                    return;
+                }
+
+                // 2. Convert JSON to CSV format
+                // Define headers
+                const headers = ['Date', 'Name', 'Phone', 'Category', 'Status', 'Payment Proof Link'];
+                
+                // Map data rows
+                const rows = data.map(doc => {
+                    const date = new Date(doc.created_at).toLocaleDateString('en-PK');
+                    return [
+                        date,
+                        `"${doc.name}"`, // Wrapped in quotes in case of commas in names
+                        doc.phone,
+                        `"${doc.category}"`,
+                        doc.status,
+                        doc.paymentProofUrl
+                    ].join(',');
+                });
+
+                // Combine headers and rows
+                const csvContent = headers.join(',') + '\n' + rows.join('\n');
+
+                // 3. Trigger Download
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                
+                link.setAttribute("href", url);
+                link.setAttribute("download", `JMSUG_Donations_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                // Success state
+                statusMsg.textContent = 'Download started successfully!';
+                statusMsg.className = 'message success';
+                statusMsg.style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                statusMsg.textContent = 'Error downloading data. Please try again.';
+                statusMsg.className = 'message error';
+                statusMsg.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '⬇ Download CSV Data';
+            }
+        });
+    </script>
+</body>
+</html>

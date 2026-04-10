@@ -1,0 +1,17 @@
+{
+  "name": "zong-donation-platform",
+  "version": "1.0.0",
+  "description": "Donation platform with WhatsApp and Zong SMS fallback",
+  "main": "netlify/functions/api.js",
+  "scripts": {
+    "start": "node netlify/functions/api.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.0",
+    "serverless-http": "^3.2.0"
+  }
+}
