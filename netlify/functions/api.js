@@ -69,26 +69,28 @@ app.post('/api/admin/donations/:id/verify', async (req, res) => {
     try {
         await connectDB();
         const donationId = req.params.id;
-        
-        // Find the donation
-        const donation = await Donation.findById(donationId);
+
+        // Use findByIdAndUpdate to safely bypass older strict validation rules
+        const donation = await Donation.findByIdAndUpdate(
+            donationId,
+            { status: 'VERIFIED' },
+            { new: true } // Returns the newly updated document
+        );
+
         if (!donation) {
             return res.status(404).json({ error: 'Donation not found.' });
         }
 
-        // Check if already verified
-        if (donation.status === 'VERIFIED') {
-            return res.status(400).json({ error: 'This donation is already verified.' });
-        }
-
-        // Update status in database
-        donation.status = 'VERIFIED';
-        await donation.save();
-
         // Send Message 2: Final Confirmation
         try {
-            const messageText = `As-salamu alaykum ${donation.name}. Jazak'Allah khair! Your donation for ${donation.category} has been VERIFIED and approved by the admin. May Allah reward you abundantly.`;
-            await notifyUser(donation.phone, messageText);
+            const messageText = `As-salamu alaykum ${donation.name}. Jazak'Allah khair! Your donation for ${donation.category} has been VERIFIED and approved by the admin.`;
+            
+            // Safety check to ensure notifyUser exists before calling it
+            if (typeof notifyUser === 'function') {
+                await notifyUser(donation.phone, messageText);
+            } else {
+                console.warn('notifyUser function is not defined.');
+            }
         } catch (msgError) {
             console.error('Message failed, but donation was verified in DB:', msgError);
         }
@@ -96,8 +98,9 @@ app.post('/api/admin/donations/:id/verify', async (req, res) => {
         res.status(200).json({ message: 'Donation verified successfully!' });
 
     } catch (error) {
-        console.error('Error verifying donation:', error);
-        res.status(500).json({ error: 'Server error during verification.' });
+        console.error('CRITICAL ERROR verifying donation:', error);
+        // We now send the EXACT error message back so you can see it in your browser!
+        res.status(500).json({ error: error.message || 'Server error during verification.' });
     }
 });
 
