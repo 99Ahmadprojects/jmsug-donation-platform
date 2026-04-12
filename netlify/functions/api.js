@@ -20,7 +20,7 @@ const connectDB = async () => {
     }
 };
 
-// 1. Existing Route: Submit Donation
+// 1. Submit Donation (Sends Message 1: Pending)
 app.post('/api/donate', async (req, res) => {
     try {
         await connectDB();
@@ -33,6 +33,14 @@ app.post('/api/donate', async (req, res) => {
         const donation = new Donation({ name, phone, category, paymentProofUrl, status: 'PENDING_VERIFICATION' });
         await donation.save();
 
+        // Send Message 1: Receipt
+        try {
+            const messageText = `As-salamu alaykum ${name}. We have received your donation proof for ${category}. Your status is currently PENDING VERIFICATION. Jazak'Allah khair!`;
+            await notifyUser(phone, messageText); 
+        } catch (msgError) {
+            console.error('Failed to send message, but donation was saved:', msgError);
+        }
+
         res.status(200).json({ 
             message: 'Donation proof submitted for review. Thank you.', 
             donationId: donation._id
@@ -44,17 +52,52 @@ app.post('/api/donate', async (req, res) => {
     }
 });
 
-// 2. NEW ADMIN ROUTE: Fetch all donations for download
-// Note: In a large production app, you would add password protection here.
+// 2. Fetch all donations for admin dashboard
 app.get('/api/admin/donations', async (req, res) => {
     try {
         await connectDB();
-        // Fetch all donations, sorted by newest first
         const donations = await Donation.find().sort({ created_at: -1 });
         res.status(200).json(donations);
     } catch (error) {
         console.error('Error fetching donations for admin:', error);
         res.status(500).json({ error: 'Failed to fetch donations data.' });
+    }
+});
+
+// 3. NEW: Verify Donation (Sends Message 2: Approved)
+app.post('/api/admin/donations/:id/verify', async (req, res) => {
+    try {
+        await connectDB();
+        const donationId = req.params.id;
+        
+        // Find the donation
+        const donation = await Donation.findById(donationId);
+        if (!donation) {
+            return res.status(404).json({ error: 'Donation not found.' });
+        }
+
+        // Check if already verified
+        if (donation.status === 'VERIFIED') {
+            return res.status(400).json({ error: 'This donation is already verified.' });
+        }
+
+        // Update status in database
+        donation.status = 'VERIFIED';
+        await donation.save();
+
+        // Send Message 2: Final Confirmation
+        try {
+            const messageText = `As-salamu alaykum ${donation.name}. Jazak'Allah khair! Your donation for ${donation.category} has been VERIFIED and approved by the admin. May Allah reward you abundantly.`;
+            await notifyUser(donation.phone, messageText);
+        } catch (msgError) {
+            console.error('Message failed, but donation was verified in DB:', msgError);
+        }
+
+        res.status(200).json({ message: 'Donation verified successfully!' });
+
+    } catch (error) {
+        console.error('Error verifying donation:', error);
+        res.status(500).json({ error: 'Server error during verification.' });
     }
 });
 
