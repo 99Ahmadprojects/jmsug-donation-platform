@@ -1,104 +1,71 @@
-const axios = require('axios');
-const Donation = require('../models/Donation');
-
+require('dotenv').config();
 
 const formatPhoneForWhatsApp = (phone) => {
-    // 1. Safety check: If phone is completely missing, return an empty string
-    if (!phone) {
-        console.warn('Warning: No phone number provided to formatter.');
-        return '';
-    }
-
-    // 2. Force the phone data to become a String (in case it arrived as a Number)
+    if (!phone) return '';
     let stringPhone = String(phone).trim();
-
-    // 3. Now it is 100% safe to use .startsWith
-    if (stringPhone.startsWith('0')) {
-        return '92' + stringPhone.substring(1);
-    }
-    if (stringPhone.startsWith('+')) {
-        return stringPhone.substring(1);
-    }
+    
+    // Convert 03xx to 923xx for WhatsApp API
+    if (stringPhone.startsWith('0')) return '92' + stringPhone.substring(1);
+    
+    // Remove the + sign if they included it (+923xx becomes 923xx)
+    if (stringPhone.startsWith('+')) return stringPhone.substring(1);
     
     return stringPhone;
 };
 
-// Function 1: Send Zong SMS
-async function sendZongSMS(phone, message) {
-    console.log(`[SYS] Falling back: Attempting Zong SMS to ${phone}...`);
-    try {
-        const response = await axios.post(process.env.ZONG_API_URL, {
-            apikey: process.env.ZONG_API_KEY,
-            sender: process.env.ZONG_SENDER_ID,
-            to: phone, // Zong usually expects 03XXXXXXXXX format
-            message: message
-        });
-
-        if (response.data && response.status === 200) {
-            console.log(`[ZONG] SMS sent successfully to ${phone}`);
-            return true;
-        }
-        return false;
-    } catch (error) {
-        console.error(`[ZONG] Error calling Zong API:`, error.message);
-        return false;
-    }
-}
-
-// Function 2: Send WhatsApp (Placeholder integration for Meta API)
-async function sendWhatsApp(formattedPhone, message) {
-    console.log(`[SYS] Attempting WhatsApp to ${formattedPhone}...`);
-    try {
-        const response = await axios.post(process.env.WA_API_URL, {
-            messaging_product: "whatsapp",
-            to: formattedPhone,
-            type: "text",
-            text: { body: message }
-        }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.WA_ACCESS_TOKEN}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.status === 200) {
-            console.log(`[WHATSAPP] Message sent successfully to ${formattedPhone}`);
-            return true;
-        }
-        return false;
-    } catch (error) {
-        console.warn(`[WHATSAPP] Failed to send message to ${formattedPhone}:`, error.response?.data || error.message);
-        return false; // Trigger fallback
-    }
-}
-
-// Main Orchestrator Function: Implementation of the WhatsApp -> Fallback SMS flow
-async function notifyUser(donationId, name, phone) {
-    // Concise and Islamic thank you message
-    const thankYouMessage = `Dear ${name}, jazak'Allah-o-khair for donating to JMSUG. We have received your payment proof for review. May Allah reward your generosity.`;
+const notifyUser = async (phone, messageText) => {
+    // 1. Validate Phone
     const waPhone = formatPhoneForWhatsApp(phone);
 
-    try {
-        // Step 1: Attempt WhatsApp
-        const waSuccess = await sendWhatsApp(waPhone, thankYouMessage);
-        
-        if (waSuccess) {
-            // Update DB and Exit
-            await Donation.findByIdAndUpdate(donationId, { whatsapp_sent: true });
-            return;
-        }
-
-        // Step 2: Fallback to Zong SMS if WhatsApp fails
-        const smsSuccess = await sendZongSMS(phone, thankYouMessage);
-        
-        if (smsSuccess) {
-            await Donation.findByIdAndUpdate(donationId, { sms_sent: true });
-        } else {
-            console.error(`[CRITICAL] Both WhatsApp and SMS failed for donation proof ${donationId}`);
-        }
-    } catch (error) {
-        console.error(`[SYS] Messaging service orchestrator error:`, error);
+    if (!waPhone) {
+        console.error('[SYS] Cancelled: No valid phone number provided to notifyUser.');
+        return false;
     }
-}
 
-module.exports = { notifyUser };
+    console.log(`[SYS] Attempting to send WhatsApp message to: ${waPhone}`);
+
+    // 2. Send via WhatsApp
+    try {
+        const waUrl = process.env.WA_API_URL;
+        const waToken = process.env.WA_ACCESS_TOKEN;
+
+        // Safety check for Environment Variables
+        if (!waUrl || !waUrl.startsWith('http')) {
+            throw new Error('WA_API_URL is missing or invalid in Netlify Environment Variables.');
+        }
+        if (!waToken) {
+            throw new Error('WA_ACCESS_TOKEN is missing in Netlify Environment Variables.');
+        }
+
+        // Send the request to Meta
+        const waResponse = await fetch(waUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${waToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to: waPhone,
+                type: "text",
+                text: { body: messageText }
+            })
+        });
+
+        // Check the response from Meta
+        if (waResponse.ok) {
+            console.log('[WHATSAPP] Message sent successfully!');
+            return true; 
+        } else {
+            const errorData = await waResponse.text();
+            throw new Error(`WhatsApp API rejected the request: ${errorData}`);
+        }
+
+    } catch (waError) {
+        console.error(`[WHATSAPP CRITICAL] Failed to send message to ${waPhone}: ${waError.message}`);
+        return false; // Return false so the server doesn't crash, it just logs the error
+    }
+};
+
+// Export the functions so your api.js can use them
+module.exports = { notifyUser, formatPhoneForWhatsApp };
