@@ -26,19 +26,28 @@ app.post('/api/donate', async (req, res) => {
         await connectDB();
         const { name, phone, category, paymentProofUrl } = req.body;
 
-        if (!name || !paymentProofUrl || !category || !/^03\d{9}$/.test(phone)) {
-            return res.status(400).json({ error: 'Name, Phone, Category, and Payment Proof are required.' });
+        // Force phone to be a string just to be safe
+        const safePhone = String(phone || '').trim();
+
+        if (!name || !paymentProofUrl || !category || !/^03\d{9}$/.test(safePhone)) {
+            return res.status(400).json({ error: 'Name, valid Phone, Category, and Payment Proof are required.' });
         }
 
-        const donation = new Donation({ name, phone, category, paymentProofUrl, status: 'PENDING_VERIFICATION' });
+        const donation = new Donation({ 
+            name, 
+            phone: safePhone, 
+            category, 
+            paymentProofUrl, 
+            status: 'PENDING_VERIFICATION' 
+        });
         await donation.save();
 
         // Send Message 1: Receipt
         try {
             const messageText = `As-salamu alaykum ${name}. We have received your donation proof for ${category}. Your status is currently PENDING VERIFICATION. Jazak'Allah khair!`;
-            await notifyUser(phone, messageText); 
+            await notifyUser(safePhone, messageText); 
         } catch (msgError) {
-            console.error('Failed to send message, but donation was saved:', msgError);
+            console.error('Failed to send pending message, but donation was saved:', msgError);
         }
 
         res.status(200).json({ 
@@ -47,7 +56,7 @@ app.post('/api/donate', async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error('Submit error:', error);
         res.status(500).json({ error: 'Server error during donation submission.' });
     }
 });
@@ -64,17 +73,17 @@ app.get('/api/admin/donations', async (req, res) => {
     }
 });
 
-// 3. NEW: Verify Donation (Sends Message 2: Approved)
+// 3. Verify Donation (Sends Message 2: Approved)
 app.post('/api/admin/donations/:id/verify', async (req, res) => {
     try {
         await connectDB();
         const donationId = req.params.id;
-
-        // Use findByIdAndUpdate to safely bypass older strict validation rules
+        
+        // Update status in database safely
         const donation = await Donation.findByIdAndUpdate(
             donationId,
             { status: 'VERIFIED' },
-            { new: true } // Returns the newly updated document
+            { new: true }
         );
 
         if (!donation) {
@@ -85,11 +94,10 @@ app.post('/api/admin/donations/:id/verify', async (req, res) => {
         try {
             const messageText = `As-salamu alaykum ${donation.name}. Jazak'Allah khair! Your donation for ${donation.category} has been VERIFIED and approved by the admin.`;
             
-            // Safety check to ensure notifyUser exists before calling it
-            if (typeof notifyUser === 'function') {
-                await notifyUser(donation.phone, messageText);
-            } else {
-                console.warn('notifyUser function is not defined.');
+            // Only send message if the database actually had a phone number for them
+            if (donation.phone && typeof notifyUser === 'function') {
+                const safePhone = String(donation.phone).trim();
+                await notifyUser(safePhone, messageText);
             }
         } catch (msgError) {
             console.error('Message failed, but donation was verified in DB:', msgError);
@@ -99,7 +107,6 @@ app.post('/api/admin/donations/:id/verify', async (req, res) => {
 
     } catch (error) {
         console.error('CRITICAL ERROR verifying donation:', error);
-        // We now send the EXACT error message back so you can see it in your browser!
         res.status(500).json({ error: error.message || 'Server error during verification.' });
     }
 });

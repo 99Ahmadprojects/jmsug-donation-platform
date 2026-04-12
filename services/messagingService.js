@@ -1,13 +1,27 @@
 const axios = require('axios');
 const Donation = require('../models/Donation');
 
-// Helper function to format phone number for WhatsApp (e.g., from 0300... to 92300...)
-function formatPhoneForWhatsApp(phone) {
-    if (phone.startsWith('03')) {
-        return '92' + phone.substring(1);
+
+const formatPhoneForWhatsApp = (phone) => {
+    // 1. Safety check: If phone is completely missing, return an empty string
+    if (!phone) {
+        console.warn('Warning: No phone number provided to formatter.');
+        return '';
     }
-    return phone;
-}
+
+    // 2. Force the phone data to become a String (in case it arrived as a Number)
+    let stringPhone = String(phone).trim();
+
+    // 3. Now it is 100% safe to use .startsWith
+    if (stringPhone.startsWith('0')) {
+        return '92' + stringPhone.substring(1);
+    }
+    if (stringPhone.startsWith('+')) {
+        return stringPhone.substring(1);
+    }
+    
+    return stringPhone;
+};
 
 // Function 1: Send Zong SMS
 async function sendZongSMS(phone, message) {
