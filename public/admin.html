@@ -3,101 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JMSUG - Admin Dashboard</title>
+    <title>JMSUG - Secure Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f8fbfa; color: #333; margin: 0; padding: 40px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        h2 { color: #1f5b8b; margin: 0; }
-        .download-btn { background-color: #1f5b8b; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        .download-btn:hover { background-color: #154366; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f4f8; color: #333; }
         
-        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #1f5b8b; color: white; }
+        /* --- LOGIN SCREEN UI --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1f5b8b 0%, #0d4a2b 100%);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            width: 100%; max-width: 400px; text-align: center;
+        }
+        .login-box h3 { color: #105934; font-size: 24px; margin-bottom: 10px; }
+        .login-box p { color: #666; font-size: 14px; margin-bottom: 25px; }
+        .login-box input {
+            width: 100%; padding: 15px; border: 2px solid #eaeaea; border-radius: 8px;
+            font-size: 16px; margin-bottom: 20px; outline: none; transition: 0.3s;
+        }
+        .login-box input:focus { border-color: #28a745; box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.1); }
+        .login-box button {
+            width: 100%; padding: 15px; background: #28a745; color: white; border: none;
+            border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .login-box button:hover { background: #1e7e34; transform: translateY(-2px); }
+        #login-error { color: #dc3545; font-size: 14px; margin-top: 15px; display: none; font-weight: 600; }
+
+        /* --- DASHBOARD UI --- */
+        #dashboard-content { display: none; padding: 40px; max-width: 1400px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        h2 { color: #1f5b8b; margin: 0; font-size: 24px; }
+        .download-btn { background-color: #1f5b8b; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; box-shadow: 0 4px 10px rgba(31, 91, 139, 0.2); }
+        .download-btn:hover { background-color: #154366; transform: translateY(-2px); }
         
-        .status-pending { color: #856404; background-color: #fff3cd; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .status-verified { color: #155724; background-color: #d4edda; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-radius: 12px; overflow: hidden; }
+        th, td { padding: 18px 20px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #1f5b8b; color: white; font-weight: 600; text-transform: uppercase; font-size: 14px; letter-spacing: 0.5px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #f8fbfa; }
         
-        .verify-btn { background-color: #28a745; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .status-pending { color: #856404; background-color: #fff3cd; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+        .status-verified { color: #155724; background-color: #d4edda; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+        
+        .verify-btn { background-color: #28a745; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.3s; }
         .verify-btn:hover { background-color: #218838; }
         .verify-btn:disabled { background-color: #6c757d; cursor: not-allowed; }
         
-        .proof-link { color: #1f5b8b; text-decoration: none; font-weight: bold; }
-        .proof-link:hover { text-decoration: underline; }
+        .proof-link { color: #1f5b8b; text-decoration: none; font-weight: 600; background: #eef4f8; padding: 8px 12px; border-radius: 6px; transition: 0.3s; display: inline-block; }
+        .proof-link:hover { background: #1f5b8b; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2>Donation Verification Dashboard</h2>
-        <button id="downloadBtn" class="download-btn">⬇ Download CSV Data</button>
+    <div id="login-screen">
+        <div class="login-box">
+            <h3>Admin Authentication</h3>
+            <p>Please enter the dashboard password</p>
+            <input type="password" id="admin-password" placeholder="Enter Password">
+            <button onclick="checkPassword()">Access Dashboard</button>
+            <p id="login-error">Incorrect password. Access denied.</p>
+        </div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Category</th>
-                <th>Payment Proof</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <tr><td colspan="7" style="text-align: center;">Loading donations...</td></tr>
-        </tbody>
-    </table>
+    <div id="dashboard-content">
+        <div class="header">
+            <h2>🛡️ Donation Verification Dashboard</h2>
+            <button id="downloadBtn" class="download-btn">⬇ Download CSV Data</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Category</th>
+                    <th>Payment Proof</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="7" style="text-align: center; padding: 30px; color: #666;">Loading donations...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
     <script>
+        // ==========================================
+        // 1. AUTHENTICATION LOGIC
+        // ==========================================
+        const ADMIN_PASSWORD = "admin123"; // <-- CHANGE THIS PASSWORD!
+
+        function checkPassword() {
+            const passInput = document.getElementById('admin-password').value;
+            if (passInput === ADMIN_PASSWORD) {
+                // Success! Hide login, show dashboard, fetch data
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
+                loadData(); 
+            } else {
+                // Failed! Show error
+                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('admin-password').value = ''; // clear input
+            }
+        }
+
+        // Allow pressing "Enter" key to login
+        document.getElementById('admin-password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+
+        // ==========================================
+        // 2. DASHBOARD LOGIC
+        // ==========================================
         let allDonations = [];
 
-        // 1. Fetch data when page loads
         async function loadData() {
             try {
                 const response = await fetch('/api/admin/donations');
                 allDonations = await response.json();
                 renderTable();
             } catch (error) {
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load data.</td></tr>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 30px;">Failed to load data from server.</td></tr>';
             }
         }
 
-        // 2. Render the table rows
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
             if (allDonations.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No donations found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #666;">No pending donations found.</td></tr>';
                 return;
             }
 
             allDonations.forEach(doc => {
-                const date = new Date(doc.created_at || doc._id).toLocaleDateString('en-PK');
+                const date = new Date(doc.created_at || doc._id).toLocaleDateString('en-PK', { year: 'numeric', month: 'short', day: 'numeric' });
                 const isVerified = doc.status === 'VERIFIED';
                 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${date}</td>
+                    <td><strong>${date}</strong></td>
                     <td>${doc.name}</td>
                     <td>${doc.phone}</td>
-                    <td>${doc.category}</td>
-                    <td><a href="${doc.paymentProofUrl}" target="_blank" class="proof-link">🔍 View Proof</a></td>
+                    <td><span style="color: #555;">${doc.category}</span></td>
+                    <td><a href="${doc.paymentProofUrl}" target="_blank" class="proof-link">🔍 View Image</a></td>
                     <td><span class="${isVerified ? 'status-verified' : 'status-pending'}">${doc.status.replace('_', ' ')}</span></td>
                     <td>
-                        ${!isVerified ? `<button class="verify-btn" onclick="verifyDonation('${doc._id}', this)">✅ Approve</button>` : '<span>✔️ Done</span>'}
+                        ${!isVerified ? `<button class="verify-btn" onclick="verifyDonation('${doc._id}', this)">✅ Approve</button>` : '<span style="color: #28a745; font-weight: bold;">✔️ Done</span>'}
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // 3. Verify Button Action
         async function verifyDonation(id, buttonElement) {
-            if (!confirm('Are you sure you want to approve this donation and send the confirmation message?')) return;
+            if (!confirm('Are you sure you want to approve this donation and send the WhatsApp confirmation?')) return;
 
             buttonElement.disabled = true;
             buttonElement.textContent = 'Approving...';
@@ -107,7 +176,7 @@
                 if (!response.ok) throw new Error('Failed to verify');
 
                 alert('Donation approved! Confirmation message sent to the user.');
-                loadData(); // Reload table to show updated status
+                loadData(); // Reload table
             } catch (error) {
                 alert('Error verifying donation. Please check server logs.');
                 buttonElement.disabled = false;
@@ -115,7 +184,6 @@
             }
         }
 
-        // 4. Download CSV functionality (Kept from previous version)
         document.getElementById('downloadBtn').addEventListener('click', () => {
             if (allDonations.length === 0) return alert("No data to download.");
             
@@ -132,9 +200,6 @@
             link.download = `JMSUG_Donations_${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
         });
-
-        // Initialize page
-        loadData();
     </script>
 </body>
 </html>
