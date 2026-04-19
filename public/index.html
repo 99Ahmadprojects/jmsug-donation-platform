@@ -6,6 +6,7 @@
     <title>JMSUG - Jamia Masjid Sayyidina Usman Ghani</title>
     <link rel="icon" type="image/png" href="1.png"> 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Base Styles & Reset */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -60,6 +61,15 @@
         .message { margin-top: 20px; text-align: center; font-weight: 600; font-size: 15px; padding: 15px; border-radius: 8px; display: none; }
         .error { color: #842029; background: #f8d7da; border: 1px solid #f5c2c7; display: block; }
         .success { color: #0f5132; background: #d1e7dd; border: 1px solid #badbcc; display: block; }
+
+        /* Social Contact Icons */
+        .social-contact { margin-top: 30px; text-align: center; border-top: 1px solid #eaeaea; padding-top: 25px; }
+        .social-contact p { font-size: 14px; color: #555; margin-bottom: 12px; font-weight: 600; }
+        .social-icons { display: flex; justify-content: center; gap: 15px; }
+        .social-icon { display: inline-flex; justify-content: center; align-items: center; width: 42px; height: 42px; border-radius: 50%; color: white; text-decoration: none; transition: all 0.3s ease; }
+        .social-icon.whatsapp { background-color: #25D366; }
+        .social-icon.facebook { background-color: #1877F2; }
+        .social-icon:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); color: white; }
 
         /* Footer */
         footer { background: #0d4a2b; color: white; text-align: center; padding: 25px; margin-top: auto; font-size: 14px; position: relative; }
@@ -129,8 +139,7 @@
             
             <div class="payment-info">
                 Please transfer your donation to:<br><br>
-                <strong>Easypaisa:</strong> 0345-XXXXXXX (JMSUG)<br>
-                <strong>JazzCash:</strong> 0300-XXXXXXX (JMSUG)<br><br>
+                <strong>Easypaisa:</strong> 0316 5234606 (Tahir Mehmood)<br>
                 Take a screenshot of your successful transaction and upload it below.
             </div>
 
@@ -149,7 +158,7 @@
                     <input type="text" id="name" required placeholder="e.g., Ali Khan">
                 </div>
                 <div class="form-group">
-                    <label for="phone">WhatsApp / Phone Number</label>
+                    <label for="phone">WhatsApp Number</label>
                     <input type="tel" id="phone" required pattern="^03\d{9}$" placeholder="03XXXXXXXXX">
                 </div>
                 <div class="form-group">
@@ -159,6 +168,19 @@
                 <button type="submit" id="submitBtn" class="submit-btn">Submit Proof</button>
             </form>
             <div id="statusMessage" class="message"></div>
+            
+            <div class="social-contact">
+                <p>Have questions? Connect with us:</p>
+                <div class="social-icons">
+                    <a href="https://wa.me/923165234606" target="_blank" class="social-icon whatsapp" title="Contact on WhatsApp">
+                        <i class="fab fa-whatsapp" style="font-size: 22px;"></i>
+                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=61572346289959&mibextid=ZbWKwL" target="_blank" class="social-icon facebook" title="Visit our Facebook Page">
+                        <i class="fab fa-facebook-f" style="font-size: 20px;"></i>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </section>
 
