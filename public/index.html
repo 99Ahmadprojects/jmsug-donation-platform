@@ -43,8 +43,13 @@
         .donation-section { padding: 100px 20px; display: flex; justify-content: center; align-items: center; }
         .container { background: white; padding: 45px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); width: 100%; max-width: 550px; border-top: 6px solid #28a745; }
         .container h2 { text-align: center; color: #105934; margin-bottom: 15px; font-size: 28px; }
+        
         .payment-info { text-align: center; background: #eefcf1; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-size: 15px; color: #444; border: 2px dashed #a3e4b5; }
         .payment-info strong { color: #105934; font-size: 17px; }
+        
+        /* Click to copy styles */
+        .copy-number { color: #28a745; cursor: pointer; font-weight: bold; text-decoration: underline; text-decoration-style: dashed; transition: color 0.3s ease; }
+        .copy-number:hover { color: #1e7e34; }
         
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; color: #444; font-weight: 600; font-size: 14px; }
@@ -66,7 +71,6 @@
         .social-contact { margin-top: 30px; text-align: center; border-top: 1px solid #eaeaea; padding-top: 25px; }
         .social-contact p { font-size: 14px; color: #555; margin-bottom: 12px; font-weight: 600; }
         .social-icons { display: flex; justify-content: center; gap: 20px; }
-        /* Increased icon size from 42px to 54px */
         .social-icon { display: inline-flex; justify-content: center; align-items: center; width: 54px; height: 54px; border-radius: 50%; color: white; text-decoration: none; transition: all 0.3s ease; }
         .social-icon.phone { background-color: #105934; }
         .social-icon.whatsapp { background-color: #25D366; }
@@ -141,8 +145,10 @@
             
             <div class="payment-info">
                 Please transfer your donation to:<br><br>
-                <strong>Easypaisa: 0316 5234606 (Tahir Mehmood)</strong><br>
-                <a href="easypaisa://send_money?phone=0316 5234606">Pay with Easypaisa</a>
+                <strong>Easypaisa:</strong> 
+                <span class="copy-number" onclick="copyNumber('03165234606')" title="Click to copy number">0316 5234606</span> (Tahir Mehmood)
+                <span id="copyAlert" style="display: none; color: #28a745; font-size: 13px; font-weight: 600; margin-left: 8px;">Copied!</span>
+                <br>
                 Take a screenshot of your successful transaction and upload it below.
             </div>
 
@@ -173,7 +179,7 @@
             <div id="statusMessage" class="message"></div>
             
             <div class="social-contact">
-                <p>Have questions? Contact with us:</p>
+                <p>Have questions? Connect with us:</p>
                 <div class="social-icons">
                     <a href="tel:03165234606" class="social-icon phone" title="Call Us">
                         <i class="fas fa-phone" style="font-size: 24px;"></i>
@@ -203,6 +209,17 @@
         function scrollToForm(categoryValue) {
             document.getElementById('category').value = categoryValue;
             document.getElementById('donate').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- NEW: Copy Number Function ---
+        function copyNumber(number) {
+            navigator.clipboard.writeText(number).then(() => {
+                const alert = document.getElementById('copyAlert');
+                alert.style.display = 'inline-block';
+                setTimeout(() => { alert.style.display = 'none'; }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
         }
 
         // --- CLOUDINARY CONFIGURATION ---
