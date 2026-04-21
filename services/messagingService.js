@@ -1,71 +1,73 @@
 require('dotenv').config();
 
-const formatPhoneForWhatsApp = (phone) => {
+// Converts Pakistani 03... numbers to 923... for WhatsApp
+const formatPhone = (phone) => {
     if (!phone) return '';
     let stringPhone = String(phone).trim();
-    
-    // Convert 03xx to 923xx for WhatsApp API
     if (stringPhone.startsWith('0')) return '92' + stringPhone.substring(1);
-    
-    // Remove the + sign if they included it (+923xx becomes 923xx)
     if (stringPhone.startsWith('+')) return stringPhone.substring(1);
-    
     return stringPhone;
 };
 
-const notifyUser = async (phone, messageText) => {
-    // 1. Validate Phone
-    const waPhone = formatPhoneForWhatsApp(phone);
+// STEP 3: Send WhatsApp Message using the Verified Template
+const sendWhatsAppMessage = async (donation) => {
+    const phone = formatPhone(donation.phone);
 
-    if (!waPhone) {
-        console.error('[SYS] Cancelled: No valid phone number provided to notifyUser.');
+    if (!phone) {
+        console.error('[SYS] Cancelled: No valid phone number provided.');
         return false;
     }
 
-    console.log(`[SYS] Attempting to send WhatsApp message to: ${waPhone}`);
+    console.log(`[SYS] Attempting to send WhatsApp Template to: ${phone}`);
 
-    // 2. Send via WhatsApp
     try {
-        const waUrl = process.env.WA_API_URL;
+        const waUrl = process.env.WA_API_URL; 
         const waToken = process.env.WA_ACCESS_TOKEN;
 
-        // Safety check for Environment Variables
-        if (!waUrl || !waUrl.startsWith('http')) {
-            throw new Error('WA_API_URL is missing or invalid in Netlify Environment Variables.');
-        }
-        if (!waToken) {
-            throw new Error('WA_ACCESS_TOKEN is missing in Netlify Environment Variables.');
+        if (!waUrl || !waToken) {
+            throw new Error('Missing WA_API_URL or WA_ACCESS_TOKEN in env variables.');
         }
 
-        // Send the request to Meta
-        const waResponse = await fetch(waUrl, {
-            method: 'POST',
+        const response = await fetch(waUrl, {
+            method: "POST",
             headers: {
-                'Authorization': `Bearer ${waToken}`,
-                'Content-Type': 'application/json'
+                "Authorization": `Bearer ${waToken}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 messaging_product: "whatsapp",
-                to: waPhone,
-                type: "text",
-                text: { body: messageText }
+                to: phone,
+                type: "template",
+                template: {
+                    name: "donation_verified",
+                    language: { code: "en" },
+                    components: [
+                        {
+                            type: "body",
+                            parameters: [
+                                { type: "text", text: donation.name },
+                                // Replaced amount with category since your DB uses 'category'
+                                { type: "text", text: donation.category } 
+                            ]
+                        }
+                    ]
+                }
             })
         });
 
-        // Check the response from Meta
-        if (waResponse.ok) {
-            console.log('[WHATSAPP] Message sent successfully!');
-            return true; 
+        if (response.ok) {
+            console.log('[WHATSAPP] Template message sent successfully!');
+            return true;
         } else {
-            const errorData = await waResponse.text();
-            throw new Error(`WhatsApp API rejected the request: ${errorData}`);
+            const errorData = await response.text();
+            console.error(`[WHATSAPP ERROR] API rejected request: ${errorData}`);
+            return false;
         }
 
-    } catch (waError) {
-        console.error(`[WHATSAPP CRITICAL] Failed to send message to ${waPhone}: ${waError.message}`);
-        return false; // Return false so the server doesn't crash, it just logs the error
+    } catch (error) {
+        console.error(`[WHATSAPP CRITICAL] Failed to send message: ${error.message}`);
+        return false; 
     }
 };
 
-// Export the functions so your api.js can use them
-module.exports = { notifyUser, formatPhoneForWhatsApp };
+module.exports = { sendWhatsAppMessage, formatPhone };

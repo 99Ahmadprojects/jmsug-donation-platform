@@ -4,7 +4,7 @@ const serverless = require('serverless-http');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const Donation = require('../../models/Donation');
-const { notifyUser } = require('../../services/messagingService');
+const { sendWhatsAppMessage } = require('../../services/messagingService'); // <-- Updated Import
 
 const app = express();
 
@@ -20,13 +20,12 @@ const connectDB = async () => {
     }
 };
 
-// 1. Submit Donation (Sends Message 1: Pending)
+// 1. Submit Donation (Data saved, NO MESSAGE SENT HERE)
 app.post('/api/donate', async (req, res) => {
     try {
         await connectDB();
         const { name, phone, category, paymentProofUrl } = req.body;
 
-        // Force phone to be a string just to be safe
         const safePhone = String(phone || '').trim();
 
         if (!name || !paymentProofUrl || !category || !/^03\d{9}$/.test(safePhone)) {
@@ -41,14 +40,6 @@ app.post('/api/donate', async (req, res) => {
             status: 'PENDING_VERIFICATION' 
         });
         await donation.save();
-
-        // Send Message 1: Receipt
-        try {
-            const messageText = `As-salamu alaykum ${name}. We have received your donation proof for ${category}. Your status is currently PENDING VERIFICATION. Jazak'Allah khair!`;
-            await notifyUser(safePhone, messageText); 
-        } catch (msgError) {
-            console.error('Failed to send pending message, but donation was saved:', msgError);
-        }
 
         res.status(200).json({ 
             message: 'Donation proof submitted for review. Thank you.', 
@@ -73,13 +64,13 @@ app.get('/api/admin/donations', async (req, res) => {
     }
 });
 
-// 3. Verify Donation (Sends Message 2: Approved)
+// 3. Verify Donation (Updates DB, THEN sends WhatsApp Template)
 app.post('/api/admin/donations/:id/verify', async (req, res) => {
     try {
         await connectDB();
         const donationId = req.params.id;
         
-        // Update status in database safely
+        // A. Update status to 'VERIFIED'
         const donation = await Donation.findByIdAndUpdate(
             donationId,
             { status: 'VERIFIED' },
@@ -90,14 +81,10 @@ app.post('/api/admin/donations/:id/verify', async (req, res) => {
             return res.status(404).json({ error: 'Donation not found.' });
         }
 
-        // Send Message 2: Final Confirmation
+        // B. Send the WhatsApp Template ONLY after verification
         try {
-            const messageText = `As-salamu alaykum ${donation.name}. Jazak'Allah khair! Your donation for ${donation.category} has been VERIFIED and approved by the admin.`;
-            
-            // Only send message if the database actually had a phone number for them
-            if (donation.phone && typeof notifyUser === 'function') {
-                const safePhone = String(donation.phone).trim();
-                await notifyUser(safePhone, messageText);
+            if (donation.phone && typeof sendWhatsAppMessage === 'function') {
+                await sendWhatsAppMessage(donation);
             }
         } catch (msgError) {
             console.error('Message failed, but donation was verified in DB:', msgError);
