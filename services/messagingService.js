@@ -39,7 +39,7 @@ const sendWhatsAppMessage = async (donation) => {
                 to: phone,
                 type: "template",
                 template: {
-                    name: "donation_verified",
+                    name: "donation_thanks",
                     language: { code: "en" },
                     components: [
                         {
