@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Deletion Instructions - JMSUG</title>
+    <link rel="icon" type="image/png" href="1.png"> 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f9f7; color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: #28a745; font-weight: 600; }
+        a:hover { text-decoration: underline; }
+        
+        header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo-container { display: flex; align-items: center; text-decoration: none; }
+        .logo-img { height: 50px; margin-right: 15px; } 
+        .logo-text { font-size: 28px; font-weight: 800; color: #105934; letter-spacing: 1px; }
+        .nav-btn { background: #28a745; color: white; padding: 10px 24px; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; border: none; font-size: 16px; }
+        .nav-btn:hover { background: #1e7e34; }
+
+        .content-section { padding: 60px 20px; flex-grow: 1; display: flex; justify-content: center; }
+        .container { background: white; padding: 45px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); width: 100%; max-width: 800px; border-top: 6px solid #842029; }
+        .container h1 { color: #842029; margin-bottom: 25px; font-size: 32px; border-bottom: 2px solid #f8d7da; padding-bottom: 10px; }
+        .container h2 { color: #1f5b8b; margin-top: 30px; margin-bottom: 15px; font-size: 22px; }
+        .container p { margin-bottom: 15px; color: #555; }
+        
+        .instruction-box { background: #f8f9fa; border-left: 4px solid #1f5b8b; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .instruction-box ol { padding-left: 20px; margin-top: 10px; }
+        .instruction-box li { margin-bottom: 10px; color: #333; font-weight: 600; }
+
+        footer { background: #0d4a2b; color: white; text-align: center; padding: 25px; margin-top: auto; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo-container">
+            <img src="1.png" alt="JMSUG Logo" class="logo-img" onerror="this.style.display='none'"> 
+            <div class="logo-text">JMSUG</div>
+        </a>
+        <a href="/" class="nav-btn">Back to Home</a>
+    </header>
+
+    <section class="content-section">
+        <div class="container">
+            <h1>Data Deletion Instructions</h1>
+            <p>Jamia Masjid Sayyidina Usman Ghani (JMSUG) respects your privacy. If you have submitted a donation proof via our portal and wish to have your personal data removed from our systems, you have the right to request its deletion.</p>
+
+            <div class="instruction-box">
+                <h2>How to request Data Deletion:</h2>
+                <p>To have your data deleted, please follow these simple steps:</p>
+                <ol>
+                    <li>Send a message from the WhatsApp number you used to submit the form.</li>
+                    <li>Message our official number: <strong>0316 5234606</strong></li>
+                    <li>Include the text: <em>"Please delete my data from the JMSUG database. My name is [Your Name]."</em></li>
+                </ol>
+            </div>
+
+            <h2>What happens next?</h2>
+            <p>Upon receiving your request, our administration will manually process it within <strong>3-5 business days</strong>. We will permanently delete the following information associated with your number:</p>
+            <ul>
+                <li>Your submitted Name</li>
+                <li>Your Phone/WhatsApp Number</li>
+                <li>The payment proof screenshot associated with your submission</li>
+            </ul>
+            <p><em>Note: We may retain a non-identifiable, anonymous record of the donation amount and category for legal accounting purposes, but it will no longer be attached to your personal information.</em></p>
+        </div>
+    </section>
+
+    <footer>
+        &copy; <span id="year"></span> Jamia Masjid Sayyidina Usman Ghani. All rights reserved.
+    </footer>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - JMSUG</title>
+    <link rel="icon" type="image/png" href="1.png"> 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f9f7; color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: #28a745; font-weight: 600; }
+        a:hover { text-decoration: underline; }
+        
+        header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo-container { display: flex; align-items: center; text-decoration: none; }
+        .logo-img { height: 50px; margin-right: 15px; } 
+        .logo-text { font-size: 28px; font-weight: 800; color: #105934; letter-spacing: 1px; }
+        .nav-btn { background: #28a745; color: white; padding: 10px 24px; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; border: none; font-size: 16px; }
+        .nav-btn:hover { background: #1e7e34; }
+
+        .content-section { padding: 60px 20px; flex-grow: 1; display: flex; justify-content: center; }
+        .container { background: white; padding: 45px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); width: 100%; max-width: 800px; border-top: 6px solid #28a745; }
+        .container h1 { color: #105934; margin-bottom: 25px; font-size: 32px; border-bottom: 2px solid #eefcf1; padding-bottom: 10px; }
+        .container h2 { color: #1f5b8b; margin-top: 30px; margin-bottom: 15px; font-size: 22px; }
+        .container p { margin-bottom: 15px; color: #555; }
+
+        footer { background: #0d4a2b; color: white; text-align: center; padding: 25px; margin-top: auto; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo-container">
+            <img src="1.png" alt="JMSUG Logo" class="logo-img" onerror="this.style.display='none'"> 
+            <div class="logo-text">JMSUG</div>
+        </a>
+        <a href="/" class="nav-btn">Back to Home</a>
+    </header>
+
+    <section class="content-section">
+        <div class="container">
+            <h1>Terms of Service</h1>
+            <p><strong>Effective Date:</strong> January 1, 2024</p>
+
+            <p>By accessing or using the donation portal for Jamia Masjid Sayyidina Usman Ghani (JMSUG), you agree to be bound by these Terms of Service. If you disagree with any part of the terms, please do not use our service.</p>
+
+            <h2>1. Voluntary Donations</h2>
+            <p>All donations made through this portal are strictly voluntary. You confirm that you are authorized to use the payment method from which the funds are transferred (such as Easypaisa or a bank account).</p>
+
+            <h2>2. Verification Process</h2>
+            <p>Submitting a screenshot of a payment does not immediately guarantee verification. All submissions are manually reviewed by the Masjid administration. You will receive a WhatsApp notification once your payment has been successfully verified against our banking records.</p>
+
+            <h2>3. Refund Policy</h2>
+            <p>Due to the nature of charitable donations (Sadaqah, Zakat, Fitra, etc.), all donations are generally non-refundable once transferred and verified. If you made an error in your transfer, please contact our administration immediately via WhatsApp.</p>
+
+            <h2>4. User Responsibilities</h2>
+            <p>You agree to provide accurate information when filling out the donation form, including a valid Pakistani WhatsApp number (starting with 03). Submitting false proof of payment or spamming the platform is strictly prohibited and may result in a ban from using our portal.</p>
+
+            <h2>5. WhatsApp Communications</h2>
+            <p>By providing your WhatsApp number, you explicitly consent to receive automated messages from JMSUG regarding the status of your donation.</p>
+
+            <h2>6. Changes to Terms</h2>
+            <p>We reserve the right to modify these terms at any time. We will indicate the date of the latest update at the top of this page.</p>
+
+        </div>
+    </section>
+
+    <footer>
+        &copy; <span id="year"></span> Jamia Masjid Sayyidina Usman Ghani. All rights reserved.
+    </footer>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
