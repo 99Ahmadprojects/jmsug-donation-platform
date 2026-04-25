@@ -26,7 +26,13 @@
         /* Hero Section */
         .hero { text-align: center; padding: 120px 20px; background: linear-gradient(135deg, #ffffff 0%, #eefcf1 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .hero h1 { font-size: 52px; color: #0d4a2b; margin-bottom: 20px; font-weight: 800; max-width: 800px; line-height: 1.2; }
-        .hero p { font-size: 18px; color: #555; max-width: 700px; margin-bottom: 40px; }
+        .hero p { font-size: 18px; color: #555; max-width: 700px; margin-bottom: 25px; }
+        
+        /* Location Link Style */
+        .location-link { display: inline-flex; align-items: center; margin-bottom: 30px; color: #105934; font-size: 16px; font-weight: 600; background: rgba(40, 167, 69, 0.1); padding: 10px 20px; border-radius: 50px; transition: all 0.3s ease; }
+        .location-link i { margin-right: 8px; color: #28a745; font-size: 18px; }
+        .location-link:hover { background: rgba(40, 167, 69, 0.2); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
         .hero-btn { background: #28a745; color: white; padding: 16px 40px; border-radius: 50px; font-size: 18px; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 15px rgba(40, 167, 69, 0.25); }
         .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(40, 167, 69, 0.4); }
 
@@ -108,6 +114,12 @@
     <section class="hero">
         <h1>Jamia Masjid Sayyidina Usman Ghani</h1>
         <p>Empowering our community through faith and generosity. The official donation portal for Jamia Masjid Sayyidina Usman Ghani offers a secure, seamless way to support the house of Allah. Give with ease and secure your Sadaqah Jariyah today.</p>
+        
+        <a href="https://www.google.com/maps/place/Usman+Ghani+Jamia+Masjid/@33.640753,72.9509468,17z/data=!3m1!4b1!4m6!3m5!1s0x38df9791ac4dcb49:0x5bc2977d6238d6f3!8m2!3d33.6407486!4d72.9535217!16s%2Fg%2F11jttycn2r?entry=ttu&g_ep=EgoyMDI2MDQyMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="location-link">
+            <i class="fas fa-map-marker-alt"></i> G-14/4 Street no.36 Islamabad , Pakistan
+        </a>
+        <br>
+        
         <button class="hero-btn" onclick="scrollToForm('General Support')">
             ♥ Start Donating
         </button>
@@ -204,7 +216,7 @@
             <a href="/terms" style="color: #a8d5ba; text-decoration: none; margin: 0 10px; font-weight: 400; font-size: 14px;">Terms of Service</a> |
             <a href="/delete-data" style="color: #a8d5ba; text-decoration: none; margin: 0 10px; font-weight: 400; font-size: 14px;">Data Deletion</a>
         </div>
-        &copy; <span id="year"></span> Jamia Masjid Sayyidina Usman Ghani. All rights reserved. 
+        © <span id="year"></span> Jamia Masjid Sayyidina Usman Ghani. All rights reserved. 
         <a href="/admin.html" class="secret-admin-dot" title="Admin" style="text-decoration:none; color:inherit; opacity:0.1;">.</a>
     </footer>
 
