@@ -115,43 +115,69 @@
     </div>
 
     <script>
+        // We store the password temporarily in JS memory ONLY if the login is successful
+        let sessionPassword = "";
+        let allDonations = [];
+
         // ==========================================
         // 1. AUTHENTICATION LOGIC
         // ==========================================
-        const ADMIN_PASSWORD = "Tahirmehmood@123456789"; // <-- CHANGE THIS PASSWORD!
-
-        function checkPassword() {
+        async function checkPassword() {
             const passInput = document.getElementById('admin-password').value;
-            if (passInput === ADMIN_PASSWORD) {
-                // Success! Hide login, show dashboard, fetch data
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('dashboard-content').style.display = 'block';
-                loadData(); 
-            } else {
-                // Failed! Show error
-                document.getElementById('login-error').style.display = 'block';
-                document.getElementById('admin-password').value = ''; // clear input
+            const btn = document.querySelector('.login-box button');
+            
+            btn.textContent = "Checking...";
+            btn.disabled = true;
+
+            try {
+                // We test the password by trying to fetch the dashboard data securely
+                const response = await fetch('/api/admin/donations', {
+                    method: 'GET',
+                    headers: { 'Authorization': passInput } 
+                });
+
+                if (response.ok) {
+                    // Success! Password was correct.
+                    sessionPassword = passInput; 
+                    allDonations = await response.json();
+                    
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('dashboard-content').style.display = 'block';
+                    renderTable(); 
+                } else {
+                    // Failed! Incorrect password.
+                    document.getElementById('login-error').style.display = 'block';
+                    document.getElementById('admin-password').value = ''; 
+                    btn.textContent = "Access Dashboard";
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                alert("Error connecting to server. Check console.");
+                btn.textContent = "Access Dashboard";
+                btn.disabled = false;
             }
         }
 
         // Allow pressing "Enter" key to login
         document.getElementById('admin-password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
+            if (e.key === 'Enter') checkPassword();
         });
-
 
         // ==========================================
         // 2. DASHBOARD LOGIC
         // ==========================================
-        let allDonations = [];
-
         async function loadData() {
             try {
-                const response = await fetch('/api/admin/donations');
-                allDonations = await response.json();
-                renderTable();
+                const response = await fetch('/api/admin/donations', {
+                    headers: { 'Authorization': sessionPassword } // ALWAYS pass the password to prove admin
+                });
+                
+                if (response.ok) {
+                    allDonations = await response.json();
+                    renderTable();
+                } else {
+                    alert("Session expired or unauthorized. Please refresh and login again.");
+                }
             } catch (error) {
                 document.getElementById('tableBody').innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 30px;">Failed to load data from server.</td></tr>';
             }
@@ -196,11 +222,14 @@
             buttonElement.textContent = 'Approving...';
 
             try {
-                const response = await fetch(`/api/admin/donations/${id}/verify`, { method: 'POST' });
+                const response = await fetch(`/api/admin/donations/${id}/verify`, { 
+                    method: 'POST',
+                    headers: { 'Authorization': sessionPassword } 
+                });
                 if (!response.ok) throw new Error('Failed to verify');
 
                 alert('Donation approved! Confirmation message sent to the user.');
-                loadData(); // Reload table
+                loadData(); 
             } catch (error) {
                 alert('Error verifying donation. Please check server logs.');
                 buttonElement.disabled = false;
@@ -208,7 +237,6 @@
             }
         }
 
-        // --- NEW: Delete Donation Function ---
         async function deleteDonation(id, buttonElement) {
             if (!confirm('Are you sure you want to permanently delete this donation? This action cannot be undone.')) return;
 
@@ -217,11 +245,14 @@
             buttonElement.textContent = 'Deleting...';
 
             try {
-                const response = await fetch(`/api/admin/donations/${id}`, { method: 'DELETE' });
+                const response = await fetch(`/api/admin/donations/${id}`, { 
+                    method: 'DELETE',
+                    headers: { 'Authorization': sessionPassword }
+                });
                 if (!response.ok) throw new Error('Failed to delete');
 
                 alert('Donation deleted successfully.');
-                loadData(); // Reload table data
+                loadData(); 
             } catch (error) {
                 alert('Error deleting donation. Please check server logs.');
                 buttonElement.disabled = false;

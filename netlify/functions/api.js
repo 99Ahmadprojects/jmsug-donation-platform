@@ -4,7 +4,7 @@ const serverless = require('serverless-http');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const Donation = require('../../models/Donation');
-const { sendWhatsAppMessage } = require('../../services/messagingService'); // <-- Updated Import
+const { sendWhatsAppMessage } = require('../../services/messagingService');
 
 const app = express();
 
@@ -20,7 +20,17 @@ const connectDB = async () => {
     }
 };
 
-// 1. Submit Donation (Data saved, NO MESSAGE SENT HERE)
+// --- SECURITY MIDDLEWARE ---
+// Checks if the password sent from the frontend matches your .env file
+const requireAdmin = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || authHeader !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ error: 'Unauthorized. Invalid or missing password.' });
+    }
+    next(); 
+};
+
+// 1. Submit Donation (Data saved, NO MESSAGE SENT HERE) - Unprotected for public use
 app.post('/api/donate', async (req, res) => {
     try {
         await connectDB();
@@ -52,8 +62,8 @@ app.post('/api/donate', async (req, res) => {
     }
 });
 
-// 2. Fetch all donations for admin dashboard
-app.get('/api/admin/donations', async (req, res) => {
+// 2. Fetch all donations for admin dashboard (Protected by requireAdmin)
+app.get('/api/admin/donations', requireAdmin, async (req, res) => {
     try {
         await connectDB();
         const donations = await Donation.find().sort({ created_at: -1 });
@@ -64,8 +74,8 @@ app.get('/api/admin/donations', async (req, res) => {
     }
 });
 
-// 3. Verify Donation (Updates DB, THEN sends WhatsApp Template)
-app.post('/api/admin/donations/:id/verify', async (req, res) => {
+// 3. Verify Donation (Protected by requireAdmin)
+app.post('/api/admin/donations/:id/verify', requireAdmin, async (req, res) => {
     try {
         await connectDB();
         const donationId = req.params.id;
@@ -98,8 +108,8 @@ app.post('/api/admin/donations/:id/verify', async (req, res) => {
     }
 });
 
-// 4. Delete Donation (Added to fix the 404 error from the admin dashboard)
-app.delete('/api/admin/donations/:id', async (req, res) => {
+// 4. Delete Donation (Protected by requireAdmin)
+app.delete('/api/admin/donations/:id', requireAdmin, async (req, res) => {
     try {
         await connectDB();
         const donationId = req.params.id;
