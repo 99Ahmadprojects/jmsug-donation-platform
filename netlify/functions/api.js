@@ -98,4 +98,24 @@ app.post('/api/admin/donations/:id/verify', async (req, res) => {
     }
 });
 
+// 4. Delete Donation (Added to fix the 404 error from the admin dashboard)
+app.delete('/api/admin/donations/:id', async (req, res) => {
+    try {
+        await connectDB();
+        const donationId = req.params.id;
+        
+        const deletedDonation = await Donation.findByIdAndDelete(donationId);
+
+        if (!deletedDonation) {
+            return res.status(404).json({ error: 'Donation not found.' });
+        }
+
+        res.status(200).json({ message: 'Donation successfully deleted from database.' });
+
+    } catch (error) {
+        console.error('Error deleting donation:', error);
+        res.status(500).json({ error: 'Server error during deletion.' });
+    }
+});
+
 module.exports.handler = serverless(app);
