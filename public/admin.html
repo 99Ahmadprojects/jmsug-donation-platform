@@ -18,7 +18,7 @@
         }
         .login-box {
             background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            width: 100%; max-width: 400px; text-align: center;
+            width: 100%; max-width: 400px; text-align: center; margin: 20px;
         }
         .login-box h3 { color: #105934; font-size: 24px; margin-bottom: 10px; }
         .login-box p { color: #666; font-size: 14px; margin-bottom: 25px; }
@@ -41,21 +41,38 @@
         .download-btn { background-color: #1f5b8b; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; box-shadow: 0 4px 10px rgba(31, 91, 139, 0.2); }
         .download-btn:hover { background-color: #154366; transform: translateY(-2px); }
         
-        table { width: 100%; border-collapse: separate; border-spacing: 0; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-radius: 12px; overflow: hidden; }
+        .table-responsive { width: 100%; overflow-x: auto; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-radius: 12px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 800px; }
         th, td { padding: 18px 20px; text-align: left; border-bottom: 1px solid #f0f0f0; }
         th { background: #1f5b8b; color: white; font-weight: 600; text-transform: uppercase; font-size: 14px; letter-spacing: 0.5px; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background-color: #f8fbfa; }
         
-        .status-pending { color: #856404; background-color: #fff3cd; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
-        .status-verified { color: #155724; background-color: #d4edda; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+        .status-pending { color: #856404; background-color: #fff3cd; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; }
+        .status-verified { color: #155724; background-color: #d4edda; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; }
         
-        .verify-btn { background-color: #28a745; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.3s; }
+        .action-buttons { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .verify-btn { background-color: #28a745; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
         .verify-btn:hover { background-color: #218838; }
         .verify-btn:disabled { background-color: #6c757d; cursor: not-allowed; }
         
-        .proof-link { color: #1f5b8b; text-decoration: none; font-weight: 600; background: #eef4f8; padding: 8px 12px; border-radius: 6px; transition: 0.3s; display: inline-block; }
+        .delete-btn { background-color: #dc3545; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.3s; white-space: nowrap; }
+        .delete-btn:hover { background-color: #c82333; }
+        .delete-btn:disabled { background-color: #e4606d; cursor: not-allowed; }
+
+        .proof-link { color: #1f5b8b; text-decoration: none; font-weight: 600; background: #eef4f8; padding: 8px 12px; border-radius: 6px; transition: 0.3s; display: inline-block; white-space: nowrap; }
         .proof-link:hover { background: #1f5b8b; color: white; }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            #dashboard-content { padding: 20px 10px; }
+            .header { flex-direction: column; align-items: stretch; gap: 15px; padding: 20px; }
+            .header h2 { font-size: 20px; text-align: center; }
+            .download-btn { width: 100%; }
+            th, td { padding: 12px 15px; font-size: 14px; }
+            .action-buttons { flex-direction: column; align-items: stretch; }
+            .verify-btn, .delete-btn { width: 100%; text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -76,29 +93,31 @@
             <button id="downloadBtn" class="download-btn">⬇ Download CSV Data</button>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Category</th>
-                    <th>Payment Proof</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="7" style="text-align: center; padding: 30px; color: #666;">Loading donations...</td></tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Category</th>
+                        <th>Payment Proof</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="7" style="text-align: center; padding: 30px; color: #666;">Loading donations...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
         // ==========================================
         // 1. AUTHENTICATION LOGIC
         // ==========================================
-        const ADMIN_PASSWORD = "tahir@123456789"; // <-- CHANGE THIS PASSWORD!
+        const ADMIN_PASSWORD = "Tahirmehmood@123456789"; // <-- CHANGE THIS PASSWORD!
 
         function checkPassword() {
             const passInput = document.getElementById('admin-password').value;
@@ -159,7 +178,10 @@
                     <td><a href="${doc.paymentProofUrl}" target="_blank" class="proof-link">🔍 View Image</a></td>
                     <td><span class="${isVerified ? 'status-verified' : 'status-pending'}">${doc.status.replace('_', ' ')}</span></td>
                     <td>
-                        ${!isVerified ? `<button class="verify-btn" onclick="verifyDonation('${doc._id}', this)">✅ Approve</button>` : '<span style="color: #28a745; font-weight: bold;">✔️ Done</span>'}
+                        <div class="action-buttons">
+                            ${!isVerified ? `<button class="verify-btn" onclick="verifyDonation('${doc._id}', this)">✅ Approve</button>` : '<span style="color: #28a745; font-weight: bold;">✔️ Done</span>'}
+                            <button class="delete-btn" onclick="deleteDonation('${doc._id}', this)">🗑️ Delete</button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -182,6 +204,27 @@
                 alert('Error verifying donation. Please check server logs.');
                 buttonElement.disabled = false;
                 buttonElement.textContent = '✅ Approve';
+            }
+        }
+
+        // --- NEW: Delete Donation Function ---
+        async function deleteDonation(id, buttonElement) {
+            if (!confirm('Are you sure you want to permanently delete this donation? This action cannot be undone.')) return;
+
+            const originalText = buttonElement.textContent;
+            buttonElement.disabled = true;
+            buttonElement.textContent = 'Deleting...';
+
+            try {
+                const response = await fetch(`/api/admin/donations/${id}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Failed to delete');
+
+                alert('Donation deleted successfully.');
+                loadData(); // Reload table data
+            } catch (error) {
+                alert('Error deleting donation. Please check server logs.');
+                buttonElement.disabled = false;
+                buttonElement.textContent = originalText;
             }
         }
 
